@@ -1,0 +1,154 @@
+---
+title: "Exploratory Analysis"
+author: "Abdullah Albyati"
+output: 
+  html_document: 
+    fig_height: 8
+    fig_width: 10
+    highlight: tango
+    theme: cosmo
+    toc: yes
+---
+## Summary 
+This is the Capstone project for Johns Hopkins University's Data Science specialization on coursera.org The goal of this capstone project is to build a Shiny application that is capable of predicting the next word based on user text input.
+
+This project was completed in three phases
+
+Downloading and cleaning the text data
+Prior to downloading the text data the algorithm will check the current working directory and see if the file already exist to avoid re downloading the file again.
+In this section I process the text to remove numbers, profanity, and white space
+
+Exploratory Analysis
+
+Prediction model and Shinny App Creation
+
+## Prepering the workspace
+```{r, message=FALSE,warning=FALSE}
+library(tidytext)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(wordcloud)
+```
+## Download, unzip, and read the data
+```{r}
+# URL for data source
+URL <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
+# If data set not downloaded already, fetch it
+if (!file.exists("Coursera-SwiftKey.zip")) {
+  download.file(URL, destfile = "Coursera-SwiftKey.zip", method="auto")
+}
+# If data set not extracted already, extract it
+if (!file.exists("data/final/en_US/en_US.blogs.txt")) {
+  unzip("Coursera-SwiftKey.zip", exdir="/data")
+}
+blogs <- readLines("data/final/en_US/en_US.blogs.txt", encoding = "UTF-8", skipNul=TRUE)
+news <- readLines("data/final/en_US/en_US.news.txt", encoding = "UTF-8", skipNul=TRUE)
+twitter <- readLines("data/final/en_US/en_US.twitter.txt", encoding = "UTF-8", skipNul=TRUE)
+rm(URL)
+```
+## Text Analysis
+Preparing the data for Analysis I will be using the tidytext package which uses the tidy data principles to work with text data. The tidy text package puts the text data into a tibble data frame format. In order to conduct analysis using tidytext the text must be in tidy text format which is according to the creators of tidytext, Julia Silge & David Robinson;
+
+  "We thus define the tidy text format as being a table with one-token-per-row. A token is a meaningful unit of text, such as a word, that we are interested in using for analysis, and tokenization is the process of splitting text into tokens. This one-token-per-row structure is in contrast to the ways text is often stored in current analyses, perhaps as strings or in a document-term matrix. For tidy text mining, the token that is stored in each row is most often a single word, but can also be an n-gram, sentence, or paragraph.”
+```{r}
+#Remove numbers from the text to get accurate text analysis
+news <- gsub('[0-9]+', '', news)
+blogs <- gsub('[0-9]+', '', blogs)
+twitter <- gsub('[0-9]+', '', twitter)
+
+# convert the text data into a tabble
+news_df <- data_frame(text = news)
+blogs_df <- data_frame(text = blogs)
+twitter_df <- data_frame(text = twitter)
+
+# now we tokenize the data into a tabble with 1 word per row
+news_tidy <- news_df %>% unnest_tokens(word, text)
+blogs_tidy <- blogs_df %>% unnest_tokens(word, text)
+twitter_tidy <- twitter_df %>% unnest_tokens(word, text)
+```
+### Words Frequency
+In order to get accurate word frequencies we must filter out <b>stop words</b>, which are words that are not useful for the analysis, common words like “the,” “of,” “to,” and so on. To filter these words we use tidyr anti_joint function combined with tidytext stop_words built-in table. Before we do that I will demonstrate the word frequency without removing the stop words.
+```{r, echo=TRUE}
+news_tidy %>% count(word, sort = TRUE)
+```
+We see in the results above that the highest frequency words are stop words which should be removed to get more meaningful results.
+### Removing Stop Words
+```{r}
+data("stop_words")
+news_tidy <- news_tidy %>% anti_join(stop_words)
+news_tidy %>% count(word, sort = TRUE)
+```
+
+```{r}
+blogs_tidy <- blogs_tidy %>% anti_join(stop_words)
+blogs_tidy %>% count(word, sort = TRUE)
+```
+```{r}
+twitter_tidy <- twitter_tidy %>% anti_join(stop_words)
+twitter_tidy %>% count(word, sort = TRUE)
+```
+### Visualize Text Data
+Because I am using tidytext package I can easily pipe the results into ggplot package for visualization
+```{r}
+news_tidy %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 2000) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = n)) +
+  ggtitle("Words Frequency Count For The News Text Set") +
+  theme(plot.title = element_text(color="blue", size=14, face="bold.italic")) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+```{r}
+blogs_tidy %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 28000) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = n)) +
+  ggtitle("Words Frequency Count For The Blogs Text Set") +
+  theme(plot.title = element_text(color="blue", size=14, face="bold.italic")) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+```{r}
+twitter_tidy %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 41000) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = n)) +
+  ggtitle("Words Frequency Count For The Twitter Text Set") +
+  theme(plot.title = element_text(color="blue", size=14, face="bold.italic")) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+### Word Cloud For The Text Data
+Again because I am using tidytext package to prepare my text data I can easily pipe the data to any visualization package
+
+```{r, message=FALSE, warning=FALSE}
+news_tidy %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100, colors=brewer.pal(8, "Spectral")))
+```
+
+```{r, message=FALSE, warning=FALSE}
+blogs_tidy %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100, colors=brewer.pal(8, "Dark2")))
+```
+
+```{r, message=FALSE, warning=FALSE}
+twitter_tidy %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100, colors=brewer.pal(4, "Set1")))
+```
