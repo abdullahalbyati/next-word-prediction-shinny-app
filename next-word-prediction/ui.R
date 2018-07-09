@@ -4,24 +4,32 @@ header <- dashboardHeader(
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("App", tabName = "app"),
-    menuItem("Exploratory Analysis", tabName = "exploratory analysis")
+    menuItem("App", tabName = "app", icon = icon("keyboard")),
+    menuItem("Exploratory Analysis", tabName = "Exploratory_Analysis", icon = icon("chart-bar")),
+    menuItem("Sampling and Modeling", tabName = "Sampling", icon = icon("splotch")),
+    menuItem("About", tabName = "About", icon = icon("address-card"))
+    
   )
 )
 
 body <- dashboardBody(
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
+    tags$link(rel = "stylesheet", type = "text/css", href = "https://use.fontawesome.com/releases/v5.1.0/css/all.css")),
+  ### changing theme
+  shinyDashboardThemes(
+    theme = "blue_gradient"
+  ),
+  
   tabItems(
     tabItem(tabName = "app",
             fluidRow(
               box(
-                title = "Starting typing", width = 12, solidHeader = TRUE, status = "warning",
-                textInput('fitb',label='',value='Show me the way'),
+                title = "Insert Text Below", width = 12, solidHeader = TRUE, status = "warning",
+                textInput('fitb',label='',value='Try me out'),
                 uiOutput('suggestions')
               ),
               box(
-                title = "Probability Histogram", width = 6, solidHeader = TRUE, status = "primary",
+                title = "Prediction Probability", width = 6, solidHeader = TRUE, status = "primary",
                 plotOutput('histo')
               ),
               box(
@@ -30,8 +38,15 @@ body <- dashboardBody(
               )
             )
     ),
-    tabItem(tabName = "exploratory analysis",
-            includeMarkdown('exploratory analysis.Rmd')
+    tabItem(tabName = "Exploratory_Analysis",
+            includeHTML('exploratory_analysis.html')
+    ),
+    tabItem(tabName = "Sampling",
+            includeHTML("Prediction.html")
+    ),
+    
+    tabItem(tabName = "About",
+            includeHTML("About.html")
     )
   )
 )

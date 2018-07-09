@@ -1,0 +1,40 @@
+---
+title: "About"
+author: "Abdullah Albyati"
+output: 
+  html_document: 
+    fig_height: 8
+    fig_width: 10
+    highlight: tango
+    theme: cosmo
+    toc: yes
+---
+This App was created by [Abdullah Albyati](www.albyati.com) using R with the following packages
+```{r, eval=FALSE}
+library(data.table)
+library(wordcloud)
+library(shiny)
+library(tm)
+library(shinydashboard)
+library(dashboardthemes)
+library(ggplot2)
+```
+
+<p>&lt;<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fabdullah.albyati%2Fposts%2F10156476386774561%3A0&width=500" width="500" height="614" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allow="encrypted-media"></iframe></p>
+
+I have originally worked on this project in 2017 and the picture below shows my original app
+
+![](http://www.clipular.com/c/4942694770802688.png?k=HdUhzUMkV2RarsC6KSMHsMYnyBU)
+
+But I decided to work on a better theme and faster processing time and this new app accomplishes just that. 
+
+# References
+https://github.com/nik01010/dashboardthemes
+
+https://rstudio.github.io/shinydashboard/appearance.html
+
+https://rpubs.com/lmullen/nlp-chapter
+
+https://github.com/lgreski/datasciencectacontent/blob/master/markdown/capstone-ngramComputerCapacity.md
+
+
