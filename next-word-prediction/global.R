@@ -28,11 +28,11 @@ predict.quadmkn <- function (words, n=5) {
   
   word1 <- words[1];word2 <- words[2];word3 <- words[3];word4 <- words[4];word5 <- words[5];
   word1_word2_word3 <- paste(tail(words,3),collapse = ' ')
-  quad <- head(d4[w1w2w3==word1_word2_word3,c('pred','pkn','ngram'),with=FALSE])
+  quad <- head(d4[w1w2w3%in%word1_word2_word3,c('pred','pkn','ngram'),with=FALSE])
   word2_word3 <- paste(tail(words,2),collapse = ' ')
-  tri <- head(d3[w1w2==word2_word3,c('pred','pkn','ngram'),with=FALSE])
+  tri <- head(d3[w1w2%in%word2_word3,c('pred','pkn','ngram'),with=FALSE])
   word3 <- tail(words,1)
-  bi <- head(d2[w1==word3,c('pred','pkn','ngram'),with=FALSE])
+  bi <- head(d2[w1%in%word3,c('pred','pkn','ngram'),with=FALSE])
   uni <- head(d1)
   result <- rbind(quad,tri,bi,uni)
   head(result,10)
